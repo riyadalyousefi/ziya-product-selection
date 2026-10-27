@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ZIYA — اختيار المنتجات</title>
+<base target="_top">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: #1f1f1f; }
+  body { font-family: -apple-system, "Segoe UI", Tahoma, "Noto Sans Arabic", Arial, sans-serif; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; }
+  header { text-align: center; }
+  .logo { width: 170px; height: auto; display: block; margin: 0 auto 18px; }
+  h1 { font-size: 22px; margin: 4px 0 8px; }
+  .intro { font-size: 15px; line-height: 1.8; color: #444; max-width: 620px; margin: 0 auto 20px; }
+  .test { display: inline-block; background: #fff3e0; color: #b45309; border: 1px solid #f5c27a; border-radius: 6px; padding: 2px 10px; font-size: 13px; margin-bottom: 12px; }
+  .test[hidden] { display: none; }
+  .counter { position: sticky; top: 0; z-index: 2; background: #fff; text-align: center; padding: 8px 0; font-size: 14px; color: #555; border-bottom: 1px solid #eee; }
+  .counter b { color: #000; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-top: 16px; }
+  .card { display: flex; flex-direction: column; border: 1px solid #e6e6e6; border-radius: 10px; overflow: hidden; cursor: pointer; background: #fff; }
+  .card.on { border-color: #111; box-shadow: 0 0 0 1px #111; }
+  .card img { width: 100%; aspect-ratio: 3 / 4; object-fit: contain; background: #fff; display: block; }
+  .row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; }
+  .row span { flex: 1; font-size: 13px; font-weight: 600; direction: ltr; text-align: right; word-break: break-word; }
+  .row input { width: 20px; height: 20px; margin: 0; accent-color: #111; flex: none; }
+  .actions { text-align: center; margin-top: 28px; }
+  button { font: inherit; font-size: 17px; font-weight: 600; background: #111; color: #fff; border: 0; border-radius: 10px; padding: 14px 40px; cursor: pointer; min-width: 240px; }
+  button:disabled { background: #888; cursor: default; }
+  .msg { margin-top: 14px; font-size: 15px; line-height: 1.7; }
+  .msg.ok { color: #1e7b34; }
+  .msg.err { color: #b3261e; }
+  @media (max-width: 480px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } h1 { font-size: 20px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="logo" id="logo" alt="قيدوم">
+    <div class="test" id="testTag" hidden>وضع الاختبار — لا تُحتسب ضمن نتيجة العميلة</div>
+    <h1>اختيار المنتجات المطلوبة</h1>
+    <p class="intro">يرجى تحديد المنتجات التي ترغبين في تجهيز بطاقات عرض لها ضمن مشروع البازار، ثم الضغط على إرسال الاختيارات.</p>
+  </header>
+  <div class="counter">المنتجات المحددة: <b id="count">0</b> من <span id="total">0</span></div>
+  <div class="grid" id="grid"></div>
+  <div class="actions">
+    <button id="send" type="button">إرسال الاختيارات</button>
+    <div class="msg" id="msg" role="status"></div>
+  </div>
+</div>
+<script>
+  var DATA = {"logo": "logo.svg", "products": [{"id": "P001", "name": "AFTER MIDNIGHT", "img": "thumbs/P001.webp"}, {"id": "P002", "name": "AZURA", "img": "thumbs/P002.webp"}, {"id": "P003", "name": "BIRAJ 1", "img": "thumbs/P003.webp"}, {"id": "P004", "name": "BIRAJ 2", "img": "thumbs/P004.webp"}, {"id": "P005", "name": "BIRAJ 3", "img": "thumbs/P005.webp"}, {"id": "P006", "name": "BLACK DRESS", "img": "thumbs/P006.webp"}, {"id": "P007", "name": "BLACK KIMONO BISHT", "img": "thumbs/P007.webp"}, {"id": "P008", "name": "BLACK SIGNATURE", "img": "thumbs/P008.webp"}, {"id": "P009", "name": "BLACK TRIA Δ", "img": "thumbs/P009.webp"}, {"id": "P010", "name": "BLOOM", "img": "thumbs/P010.webp"}, {"id": "P011", "name": "BLOOMY PETALS", "img": "thumbs/P011.webp"}, {"id": "P012", "name": "BLUSHING MOSS", "img": "thumbs/P012.webp"}, {"id": "P013", "name": "BROWN DRESS", "img": "thumbs/P013.webp"}, {"id": "P014", "name": "BROWN SIGNATURE", "img": "thumbs/P014.webp"}, {"id": "P015", "name": "BROWN TRIA Δ", "img": "thumbs/P015.webp"}, {"id": "P016", "name": "COCOA", "img": "thumbs/P016.webp"}, {"id": "P017", "name": "CONCRETE", "img": "thumbs/P017.webp"}, {"id": "P018", "name": "CRIMSON", "img": "thumbs/P018.webp"}, {"id": "P019", "name": "DIRIYAH #2 - الدرعية #٢", "img": "thumbs/P019.webp"}, {"id": "P020", "name": "DIRIYAH - الدرعية", "img": "thumbs/P020.webp"}, {"id": "P021", "name": "DUNE'S ECHO - صدى الصحراء", "img": "thumbs/P021.webp"}, {"id": "P022", "name": "DUSK", "img": "thumbs/P022.webp"}, {"id": "P023", "name": "DUSTY PINK DRESS", "img": "thumbs/P023.webp"}, {"id": "P024", "name": "ECLIPSE", "img": "thumbs/P024.webp"}, {"id": "P025", "name": "ELECTRIC", "img": "thumbs/P025.webp"}, {"id": "P026", "name": "ELECTRUM", "img": "thumbs/P026.webp"}, {"id": "P027", "name": "ENCHANTED EMERALD", "img": "thumbs/P027.webp"}, {"id": "P028", "name": "FAIRY", "img": "thumbs/P028.webp"}, {"id": "P029", "name": "FLORAL", "img": "thumbs/P029.webp"}, {"id": "P030", "name": "FOREST", "img": "thumbs/P030.webp"}, {"id": "P031", "name": "GLOOMY", "img": "thumbs/P031.webp"}, {"id": "P032", "name": "GLOOMY SKY", "img": "thumbs/P032.webp"}, {"id": "P033", "name": "GOLDEN GLORY", "img": "thumbs/P033.webp"}, {"id": "P034", "name": "GOLGARI", "img": "thumbs/P034.webp"}, {"id": "P035", "name": "GREY DRESS", "img": "thumbs/P035.webp"}, {"id": "P036", "name": "HAZE", "img": "thumbs/P036.webp"}, {"id": "P037", "name": "INDIGO", "img": "thumbs/P037.webp"}, {"id": "P038", "name": "JADE", "img": "thumbs/P038.webp"}, {"id": "P039", "name": "KHAKI DRESS", "img": "thumbs/P039.webp"}, {"id": "P040", "name": "KHAKI SIGNATURE", "img": "thumbs/P040.webp"}, {"id": "P041", "name": "KHAKI TRIA Δ", "img": "thumbs/P041.webp"}, {"id": "P042", "name": "KHUZAMA", "img": "thumbs/P042.webp"}, {"id": "P043", "name": "KŌNA", "img": "thumbs/P043.webp"}, {"id": "P044", "name": "LAVISH", "img": "thumbs/P044.webp"}, {"id": "P045", "name": "LEA", "img": "thumbs/P045.webp"}, {"id": "P046", "name": "LIGHT BLUE DRESS", "img": "thumbs/P046.webp"}, {"id": "P047", "name": "MAHOGANY", "img": "thumbs/P047.webp"}, {"id": "P048", "name": "MAIN CHARACTER", "img": "thumbs/P048.webp"}, {"id": "P049", "name": "MALACHITE", "img": "thumbs/P049.webp"}, {"id": "P050", "name": "MANDARIN", "img": "thumbs/P050.webp"}, {"id": "P051", "name": "MAROON DRESS", "img": "thumbs/P051.webp"}, {"id": "P052", "name": "MAROON SIGNATURE", "img": "thumbs/P052.webp"}, {"id": "P053", "name": "MAROON TRIA Δ", "img": "thumbs/P053.webp"}, {"id": "P054", "name": "MEADOW", "img": "thumbs/P054.webp"}, {"id": "P055", "name": "MIDNIGHT", "img": "thumbs/P055.webp"}, {"id": "P056", "name": "MIDORI", "img": "thumbs/P056.webp"}, {"id": "P057", "name": "MINK", "img": "thumbs/P057.webp"}, {"id": "P058", "name": "MOCHA", "img": "thumbs/P058.webp"}, {"id": "P059", "name": "MOCHA TWIST", "img": "thumbs/P059.webp"}, {"id": "P060", "name": "MURJAN - مرجان", "img": "thumbs/P060.webp"}, {"id": "P061", "name": "MUSE BLACK", "img": "thumbs/P061.webp"}, {"id": "P062", "name": "MUSE BROWN", "img": "thumbs/P062.webp"}, {"id": "P063", "name": "NAJD BLACK", "img": "thumbs/P063.webp"}, {"id": "P064", "name": "NAJD BROWN", "img": "thumbs/P064.webp"}, {"id": "P065", "name": "NATIONAL DAY LIMITED EDITION", "img": "thumbs/P065.webp"}, {"id": "P066", "name": "NAVY DRESS", "img": "thumbs/P066.webp"}, {"id": "P067", "name": "NAVY TRIA Δ", "img": "thumbs/P067.webp"}, {"id": "P068", "name": "NEELA", "img": "thumbs/P068.webp"}, {"id": "P069", "name": "NOMAD", "img": "thumbs/P069.webp"}, {"id": "P070", "name": "OAKBERRY", "img": "thumbs/P070.webp"}, {"id": "P071", "name": "OASIS", "img": "thumbs/P071.webp"}, {"id": "P072", "name": "OLD SIGNATURE", "img": "thumbs/P072.webp"}, {"id": "P073", "name": "OLIVE-YOU", "img": "thumbs/P073.webp"}, {"id": "P074", "name": "ONYX", "img": "thumbs/P074.webp"}, {"id": "P075", "name": "PEONIX", "img": "thumbs/P075.webp"}, {"id": "P076", "name": "PLUM", "img": "thumbs/P076.webp"}, {"id": "P077", "name": "PUMPKIN", "img": "thumbs/P077.webp"}, {"id": "P078", "name": "PURPLE DRESS", "img": "thumbs/P078.webp"}, {"id": "P079", "name": "PURPLE TRIA Δ", "img": "thumbs/P079.webp"}, {"id": "P080", "name": "ROSETTE", "img": "thumbs/P080.webp"}, {"id": "P081", "name": "RUST", "img": "thumbs/P081.webp"}, {"id": "P082", "name": "SADU", "img": "thumbs/P082.webp"}, {"id": "P083", "name": "SASSBERRY", "img": "thumbs/P083.webp"}, {"id": "P084", "name": "SCARF 01", "img": "thumbs/P084.webp"}, {"id": "P085", "name": "SCARF 02", "img": "thumbs/P085.webp"}, {"id": "P086", "name": "SCARF 03", "img": "thumbs/P086.webp"}, {"id": "P087", "name": "SCARF 04", "img": "thumbs/P087.webp"}, {"id": "P088", "name": "SCARF 05", "img": "thumbs/P088.webp"}, {"id": "P089", "name": "SEPIA", "img": "thumbs/P089.webp"}, {"id": "P090", "name": "SPICY SUNSET", "img": "thumbs/P090.webp"}, {"id": "P091", "name": "STONY", "img": "thumbs/P091.webp"}, {"id": "P092", "name": "TAIF - طيف", "img": "thumbs/P092.webp"}, {"id": "P093", "name": "TEAL DRESS", "img": "thumbs/P093.webp"}, {"id": "P094", "name": "TERRACOTTA", "img": "thumbs/P094.webp"}, {"id": "P095", "name": "TWILIGHT", "img": "thumbs/P095.webp"}, {"id": "P096", "name": "VELOUR", "img": "thumbs/P096.webp"}, {"id": "P097", "name": "VERDANT", "img": "thumbs/P097.webp"}, {"id": "P098", "name": "WHITE KIMONO BISHT", "img": "thumbs/P098.webp"}, {"id": "P099", "name": "WOOD", "img": "thumbs/P099.webp"}]};
+  var MODE = new URLSearchParams(location.search).get('mode') === 'test' ? 'test' : 'real';
+  var API = 'https://script.google.com/macros/s/AKfycbzSZnp7W-08E9rYPmeu9dwxEiCv5gip5xRnc5KdwWG9cYIitBFoEWoGMM4jO9Wpwqhm/exec';
+  var submissionId = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+  var grid = document.getElementById('grid'), countEl = document.getElementById('count');
+  var btn = document.getElementById('send'), msg = document.getElementById('msg');
+  var sending = false, done = false;
+
+  document.getElementById('logo').src = DATA.logo;
+  document.getElementById('total').textContent = DATA.products.length;
+  if (MODE === 'test') document.getElementById('testTag').hidden = false;
+
+  DATA.products.forEach(function (p) {
+    var label = document.createElement('label');
+    label.className = 'card';
+    var img = document.createElement('img');
+    img.loading = 'lazy'; img.decoding = 'async'; img.alt = p.name; img.src = p.img;
+    var row = document.createElement('div'); row.className = 'row';
+    var name = document.createElement('span'); name.textContent = p.name;
+    var cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = p.id;
+    cb.addEventListener('change', function () { label.classList.toggle('on', cb.checked); updateCount(); });
+    row.appendChild(cb); row.appendChild(name);
+    label.appendChild(img); label.appendChild(row);
+    grid.appendChild(label);
+  });
+
+  function selectedIds() {
+    return Array.prototype.map.call(grid.querySelectorAll('input:checked'), function (c) { return c.value; });
+  }
+  function updateCount() { countEl.textContent = selectedIds().length; }
+
+  btn.addEventListener('click', function () {
+    if (sending || done) return;
+    var ids = selectedIds();
+    if (!ids.length && !confirm('لم يتم تحديد أي منتج. هل تريدين الإرسال على أي حال؟')) return;
+    sending = true; btn.disabled = true; btn.textContent = 'جارٍ الحفظ…';
+    msg.className = 'msg'; msg.textContent = '';
+    send({ submissionId: submissionId, selected: ids, mode: MODE }, function (res) {
+        sending = false;
+        if (!res || !res.ok) return fail();
+        done = true;
+        btn.textContent = 'تم الإرسال';
+        grid.querySelectorAll('input').forEach(function (c) { c.disabled = true; });
+        msg.className = 'msg ok';
+        msg.textContent = 'تم حفظ اختياراتك بنجاح — ' + res.selected + ' من ' + res.total + ' منتج. شكرًا لك.';
+      }, fail);
+  });
+
+  // no Google cookies are sent (credentials: 'omit'), so signed-in phones are never routed to /u/N/
+  function send(payload, onOk, onErr) {
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = ctl && setTimeout(function () { ctl.abort(); }, 60000);
+    fetch(API, { method: 'POST', credentials: 'omit', redirect: 'follow', signal: ctl && ctl.signal,
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(Object.assign({ action: 'submit' }, payload)) })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (res) { clearTimeout(timer); onOk(res); })
+      .catch(function () { clearTimeout(timer); onErr(); });
+  }
+
+  function fail() {
+    sending = false; btn.disabled = false; btn.textContent = 'إرسال الاختيارات';
+    msg.className = 'msg err';
+    msg.textContent = 'تعذّر حفظ الاختيارات. يرجى المحاولة مرة أخرى.';
+  }
+</script>
+</body>
+</html>
